@@ -1,0 +1,31 @@
+1.Q:
+    Compile and run the example as is. Do you observe the "main" thread’s write to mi.value remains
+    invisible to the t thread, so that it loops forever? Independently of your observation, is it possible that the
+    program loops forever? Explain your answer.
+
+1.A:
+        The program will obviously loop forever because the integer is not visible to the other thread, it is only stored in the local registry for the thread and never flushed back to the main memory
+        However, at some point the JVM will decide to flush the value of the variable to the main memory and at some other point the second thread to decide to refresh its registries and caches
+        from the main memory hence eventually the program will terminate.
+
+
+2.Q:
+    Use Java Intrinsic Locks (synchronized) on the methods of the MutableInteger to ensure that
+    thread t always terminates. Explain why your solution prevents thread t from running forever.
+
+2.A:
+    It always terminate because the lock comes with happen-before and visibility guarantee which ensures that all the variables that are visible to the current thread at that point of time
+    are flushed to the main memory, hence they become visible to other threads
+
+3.Q:
+    Would thread t always terminate if get() is not defined as synchronized? Explain your answer.
+
+3.A:
+    No, because it will only read from the local registry, and since the reading thread does not perform any writing to the variable it will never need to gets its value from main memory
+
+4.Q:
+    Remove all the locks in the program, and define value in MutableInteger as a volatile variable.
+    Does thread t always terminate in this case? Explain your answer.
+
+4.A:
+    Yes, it does because volatile ensure that the variable will always be read from the main memory rather that the local registry/cache
