@@ -1,0 +1,28 @@
+1.Q:
+    Compile the program and run it several times. Show the results you get. Are there any race conditions?
+1.A:
+    Sum is 1233476.000000 and should be 2000000.000000
+     yes there is a race condition
+
+
+
+2Q.
+    Explain why race conditions appear when t1 and t2 use the Mystery object. Hint: Consider (a) what it
+    means for an instance method to be synchronized, and (b) what it means for a static method to be synchronized.
+
+2A.
+    The first synchronization is on an instance method, Thus,we have only one thread can execute per instance. so if we have two threads and trying to execute
+    the same "instance locked method" only one of them will succeed and the second will be blocked until the first one finishes.
+    The second synchronization is synchronized on the static methods, hence on the class object. Thus, only one thread can execute inside the static method in the same class
+        since one of our threads uses the instance to lock and the second thread uses the class object lo lock, then they two threads are not using the same lock, hence they can have a race condition
+        on the shared variable because the threads must use the same lock in order to ensure thread safety.
+
+
+3Q.
+    Implement a new version of the class Mystery so that the execution of t1 and t2 does not produce race
+    conditions, without changing its sequential behavior. That is, you should not make any static field into an
+    instance field (or vice versa), and you should not make any static method into an instance method (or vice
+    versa). Explain why the new implementation does not have race conditions.
+
+3A:
+    please see the modified version of the class
