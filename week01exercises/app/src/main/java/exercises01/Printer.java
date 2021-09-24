@@ -1,6 +1,5 @@
 package exercises01;
 
-import java.awt.font.FontRenderContext;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -26,7 +26,7 @@ public class CountIncrementer extends ReentrantLock {
         // 2- add one
         // write to the field againALOAD 0
         //        ALOAD 0
-        //        DUP  // Make duplicate reference
+        //        DUP  //  duplicate reference for another variable
         //        GETFIELD exercises01/test.count : I
         //        ICONST_1
         //        IADD
@@ -42,7 +42,7 @@ public class CountIncrementer extends ReentrantLock {
         //        ALOAD 0  // Push local variable 0 (this)
         //        GETFIELD exercises01/test.count : I
         //        ICONST_1   // Push int constant 1
-        //        IADD       // add the integer 1
+        //        IADD       // add integer 1
         //        PUTFIELD exercises01/test.count : I
     }
 

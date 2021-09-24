@@ -1,0 +1,12 @@
+
+2- it is thread safe because :
+2.1 there is no escape while creating the object, object creation has been guarded using binary semaphore which acts as a lock in this case
+2.2 the shared memory source is made static volatile, hence there will be only one instance of it and this instance is visible to all threads since it is flushed to the main memory
+2.3 since the semaphores are used to prevent overlapping scenarios by signalling and awaiting based on two semaphores, hence the operations in the SemphoreBuffer class are behaving in a safe way.
+NOTE : even when we have created the Queue as a private inner class, it can still be accessed using reflection, and that is why we added another binary semaphore to ensure safe access at that level
+
+3- it is possible to implement the consumer producer using the barrier, simply by creating a cyclicbarrier object and pass the number of threads we want to execute to it
+then we will make the producers call the insert method before the barrier and the consumers after the barrier. once all producers and consumers have finished executing the barrier will break
+
+4- the fair flag ensure weak fairness S.T the thread that waited the most in the blocking queue will enter the running state before new threads that just entered the queue.
+for this particular example it does not matter. but it can be useful when we make use of the sleep() method to make a thread wait.
