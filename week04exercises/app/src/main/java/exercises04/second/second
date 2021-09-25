@@ -1,0 +1,4 @@
+1- implemented
+2- it is thread safe since all exposed methods are synchronized and no thread can have uncompleted copy of the constructor . even reference variable like string are accessed using locks
+3- implemented
+4- No it is not thread safe, there is no possible way to make a thread safe idGenerator that is shared between multiple JVM. Thus, the implementation is thread safe for one JVM
