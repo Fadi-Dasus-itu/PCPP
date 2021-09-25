@@ -1,0 +1,284 @@
+3.1 For the exercices we used Windows (W) and Linux (L) machines:
+
+Mark 1 (Windows) > 0.003 s     0.2ns
+Mark 1 (Linux) >  0.006 s     0.3ns 
+- The results are similar to the ones in the note. The experiment is not useful, because the operation is only one and we cannot precisely
+predict if it takes so long because of the execution or the startup of the program etc. Also because the JVM will make some optimization of the code that we cannot control/predict.
+
+
+Mark 2 (W) > 16.0 ns
+Mark 2 (L) > 22.8 ns
+- The result for Windows shows time that is half the time shown in the notes. That may be because of the difference in the hardware:
+Intel i7 in the notes vs Ryzen 7. Also influence have the OS, the RAM etc
+
+
+Mark 3 (W) > 16.0 ns, 16.0 ns, 15.9 ns, 15.9 ns, 16.0 ns, 15.9 ns, 15.9 ns, 16.0 ns, 16.0 ns, 16.0 ns
+Mark 3 (L) > 21.4 ns, 21.5 ns, 21.3 ns, 21.5 ns, 23.5 ns, 22.5 ns, 22.6 ns, 22.4 ns, 22.6 ns, 22.5 ns
+- The results are similar to the ones in Mark2 (as it is with the results in the notes for Mark2 and Mark3). They are more accurate since the check time function is executed 
+automatically as the program runs (inside a loop) and not after the loop as in Mark2 (startup time, for example, influences the performance).
+
+
+Mark 4 (W) > 15.9 +/-  0.046 ns
+Mark 4 (L) > 22.1 ns +/-  1.151
+The result again is proportionally similar to the one in the notes, compared to the previous.
+
+
+Mark 5 (W) > 
+   0.0 +/-     0.00 ns          2
+   0.0 +/-     0.00 ns          4
+   0.0 +/-     0.00 ns          8
+   0.0 +/-     0.00 ns         16
+   0.0 +/-     0.00 ns         32
+   0.0 +/-     0.00 ns         64
+   0.0 +/-     0.00 ns        128
+   0.0 +/-     0.00 ns        256
+   0.0 +/-     0.00 ns        512
+   0.0 +/-     0.00 ns       1024
+   0.0 +/-     0.00 ns       2048
+   0.0 +/-     0.00 ns       4096
+   0.0 +/-     0.00 ns       8192
+   0.0 +/-     0.00 ns      16384
+   0.0 +/-     0.00 ns      32768
+   1.5 +/-     4.83 ns      65536
+   4.6 +/-     3.94 ns     131072
+  13.0 +/-     3.22 ns     262144
+  13.4 +/-     1.56 ns     524288
+  12.1 +/-     3.54 ns    1048576
+  11.3 +/-     3.87 ns    2097152
+  15.0 +/-     0.99 ns    4194304
+  15.4 +/-     0.42 ns    8388608
+  15.7 +/-     0.16 ns   16777216
+
+Mark 5 (L) > 
+  104.6 ns +/-    68.93          2
+  60.8 ns +/-    24.40          4
+  43.2 ns +/-    12.78          8
+  43.0 ns +/-     8.20         16
+  31.8 ns +/-     4.84         32
+  36.3 ns +/-     7.16         64
+  33.6 ns +/-     3.04        128
+  32.6 ns +/-     1.63        256
+  32.1 ns +/-     0.81        512
+  31.8 ns +/-     0.38       1024
+  35.0 ns +/-    12.02       2048
+  29.0 ns +/-     5.32       4096
+  28.0 ns +/-     2.77       8192
+  24.9 ns +/-     1.49      16384
+  25.7 ns +/-     2.39      32768
+  25.0 ns +/-     1.49      65536
+  24.6 ns +/-     1.89     131072
+  23.4 ns +/-     0.99     262144
+  22.5 ns +/-     0.69     524288
+  25.8 ns +/-     1.79    1048576
+  23.6 ns +/-     1.44    2097152
+  21.8 ns +/-     0.73    4194304
+  22.5 ns +/-     0.56    8388608
+  22.4 ns +/-     0.59   16777216
+
+- For the Windows machine, the count is doubled until it reaches execution time that is at least 0.25 secs. In the notes that time
+is reached when the count it 8388608, while in our case that is its double 16777216 which again shows the
+program is executed faster on this machine rather than the one used for the experiments in the notes. Another
+big difference is that in our case the mean and deviation time remain 0 for many rounds and slowly and steadily 
+increase until the stable 15.6 ns while in the notes, they start at 100 and then fall down and then again rise up
+and so on.
+
+
+Mark 6 (W) >
+multiply                              0.0 ns       0.00          2
+multiply                              0.0 ns       0.00          4
+multiply                              0.0 ns       0.00          8
+multiply                              0.0 ns       0.00         16
+multiply                              0.0 ns       0.00         32
+multiply                              0.0 ns       0.00         64
+multiply                              0.0 ns       0.00        128
+multiply                              0.0 ns       0.00        256
+multiply                              0.0 ns       0.00        512
+multiply                              0.0 ns       0.00       1024
+multiply                              0.0 ns       0.00       2048
+multiply                              0.0 ns       0.00       4096
+multiply                              0.0 ns       0.00       8192
+multiply                              0.0 ns       0.00      16384
+multiply                              0.0 ns       0.00      32768
+multiply                              0.0 ns       0.00      65536
+multiply                              4.6 ns       5.33     131072
+multiply                             12.6 ns       3.62     262144
+multiply                             13.5 ns       1.41     524288
+multiply                             11.9 ns       3.90    1048576
+multiply                             13.3 ns       3.09    2097152
+multiply                             14.8 ns       0.81    4194304
+multiply                             15.5 ns       0.45    8388608
+multiply 
+                            15.6 ns       0.27   16777216
+Mark 6 (L) >
+multiply                            464.6 ns     993.85          2
+multiply                            150.2 ns      49.59          4
+multiply                            142.6 ns      34.69          8
+multiply                            130.5 ns      18.06         16
+multiply                            142.8 ns      33.11         32
+multiply                            248.3 ns     114.92         64
+multiply                             47.0 ns      12.31        128
+multiply                             45.2 ns      17.40        256
+multiply                             48.8 ns      24.38        512
+multiply                             38.2 ns       9.35       1024
+multiply                             34.9 ns       5.31       2048
+multiply                             32.7 ns       3.41       4096
+multiply                             27.2 ns       4.05       8192
+multiply                             25.3 ns       1.78      16384
+multiply                             23.9 ns       1.25      32768
+multiply                             24.6 ns       2.19      65536
+multiply                             22.5 ns       0.64     131072
+multiply                             22.2 ns       1.17     262144
+multiply                             21.9 ns       0.92     524288
+multiply                             23.8 ns       1.59    1048576
+multiply                             22.7 ns       1.24    2097152
+multiply                             22.4 ns       1.35    4194304
+multiply                             22.6 ns       1.03    8388608
+multiply                             22.4 ns       0.62   16777216
+
+- As with Mark5, here we observe a similar pattern -- the mean and deviation time start at 0 and slowly and
+steadily increase, while in the notes example, they take more time in the initial rounds and then the times
+vary up and down with a tendency to become quicker. 
+
+
+
+Mark7 (W) >
+pow                                  29.6 ns       0.11   16777216
+exp                                  18.4 ns       0.12   16777216
+log                                  11.8 ns       0.05   33554432
+sin                                  18.3 ns       0.13   16777216
+cos                                  17.9 ns       0.07   16777216
+tan                                  31.8 ns       0.13    8388608
+asin                                 16.0 ns       0.13   16777216
+acos                                 16.2 ns       0.12   16777216
+atan                                 13.9 ns       0.04   33554432
+
+Mark7 (L) >
+pow                                  18.8 ns       0.71   16777216
+exp                                  19.7 ns       0.48   16777216
+log                                  11.5 ns       0.16   33554432
+sin                                  15.0 ns       0.31   33554432
+cos                                  14.9 ns       0.16   33554432
+tan                                  20.9 ns       2.06   16777216
+asin                                115.2 ns      18.45    4194304
+acos                                 90.1 ns       6.45    4194304
+atan                                 31.6 ns       1.85    8388608
+- Again, the results are much faster (especially for the Windows machine) than the ones in the note example. The deviations are also very small.
+
+
+3.2
+1. The tendency is that the initial time is longer and it quickly decreases. In some cases hashCode() the values
+will go up and down but eventually reach a stable mean time. The deviation varies more but it also tends towards
+smaller values.
+2. Output >
+# OS:   Windows 10; 10.0; amd64
+# JVM:  Oracle Corporation; 1.8.0_281
+# CPU:  AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD; 8 "cores"
+# Date: 2021-09-13T21:26:04+0200
+Mark 7 measurements
+hashCode()                            2.7 ns       0.01  134217728
+Point creation                       34.8 ns       0.23    8388608
+Thread's work                      4284.3 ns      21.07      65536
+Thread create                       601.0 ns       5.60     524288
+Thread create start               59299.5 ns     169.00       8192
+Thread create start join         136815.7 ns    3119.74       2048
+ai value = 1515460000
+Uncontended lock                      5.1 ns       0.02   67108864
+The values are a bit lower/faster than the ones obeserved in the slides: hashCode - 3ns, Point creation - 50ns,
+thread creation - 700ns
+
+
+3.3
+1. > 
+# OS:   Windows 10; 10.0; amd64
+# JVM:  Oracle Corporation; 1.8.0_281
+# CPU:  AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD; 8 "cores"
+# Date: 2021-09-13T22:29:48+0200
+countSequential                12113366.3 ns   49466.98         32
+countParallelN       1         13167188.4 ns   92151.32         32
+countParallelN       2          8786318.8 ns   71600.73         32
+countParallelN       3          5766047.5 ns   60455.79         64
+countParallelN       4          4621060.8 ns   45868.76         64
+countParallelN       5          4289066.7 ns  160164.31         64
+countParallelN       6          3731581.5 ns   26982.13        128
+countParallelN       7          3621850.7 ns   20992.14        128
+countParallelN       8          3611183.5 ns   14008.03        128
+countParallelN       9          3631993.8 ns   10488.85        128
+countParallelN      10          3646120.5 ns   14672.30        128
+countParallelN      11          3648984.1 ns    8608.51        128
+countParallelN      12          3654647.1 ns    9920.75        128
+countParallelN      13          3657745.9 ns   11866.53        128
+countParallelN      14          3647894.1 ns   22823.89        128
+countParallelN      15          3599567.5 ns   52319.05        128
+countParallelN      16          3643102.2 ns   12212.00        128
+countParallelN      17          3501918.8 ns  146596.66        128
+countParallelN      18          3626511.7 ns   11756.67        128
+countParallelN      19          3602774.0 ns   32075.55        128
+countParallelN      20          3636394.1 ns   17080.05        128
+countParallelN      21          3625624.3 ns   29750.78        128
+countParallelN      22          3740142.0 ns  258074.18        128
+countParallelN      23          3569483.7 ns   27260.03        128
+countParallelN      24          3597010.1 ns   16363.26        128
+countParallelN      25          3579949.9 ns   18613.37        128
+countParallelN      26          3603808.8 ns   44346.78        128
+countParallelN      27          3568466.0 ns   35983.84        128
+countParallelN      28          3573625.4 ns   18978.81        128
+countParallelN      29          3557823.4 ns   16497.31        128
+countParallelN      30          3552338.5 ns   70540.59        128
+countParallelN      31          3530454.7 ns   20049.49        128
+countParallelN      32          3587392.9 ns  203063.63        128
+
+2. > From the output we can see that it takes considerably less time - 8786318.8 for 2 therads, rather than 13167188.4 
+for 1 thread. The mean value seems to reach its lowest when 7 or more threads are used but it does not change
+much even if 32 threads are used. That shows that the mean time does not directly depend on the number of threads used.
+That is because each threads executes in a core and a second thread cannot start executing before the firts one has
+finished and thus has to wait. Therefore, the optimal number of therads is the numbers of cores that the PC has.
+
+3. >
+# OS:   Windows 10; 10.0; amd64
+# JVM:  Oracle Corporation; 1.8.0_281
+# CPU:  AMD64 Family 23 Model 96 Stepping 1, AuthenticAMD; 8 "cores"
+# Date: 2021-09-13T22:45:06+0200
+countSequential                12082071.3 ns   36366.71         32
+countParallelN       1         13150631.3 ns   81920.93         32
+countParallelN       2          8690863.1 ns  107051.32         32
+countParallelN       3          5743303.4 ns   64996.84         64
+countParallelN       4          4495096.7 ns   37386.67         64
+countParallelN       5          4111191.4 ns   41914.66         64
+countParallelN       6          3510893.3 ns   30561.36        128
+countParallelN       7          2900612.7 ns   41007.82        128
+countParallelN       8          3000519.4 ns  326438.23        128
+countParallelN       9          2936969.6 ns  110176.06        128
+countParallelN      10          2910000.1 ns   23576.69        128
+countParallelN      11          2964053.1 ns  116882.63        128
+countParallelN      12          2926797.5 ns  138441.69        128
+countParallelN      13          2763167.4 ns   30009.32        128
+countParallelN      14          2689507.0 ns   38984.62        128
+countParallelN      15          2583982.1 ns   24777.44        128
+countParallelN      16          2559437.7 ns   33410.15        128
+countParallelN      17          2605405.2 ns   65269.91        128
+countParallelN      18          2648202.0 ns   96138.85        128
+countParallelN      19          2701777.6 ns  115495.30        128
+countParallelN      20          2629917.7 ns   22270.73        128
+countParallelN      21          2653485.8 ns   22998.57        128
+countParallelN      22          2646252.6 ns   21181.24        128
+countParallelN      23          2665759.2 ns   38271.15        128
+countParallelN      24          2672637.0 ns   36379.98        128
+countParallelN      25          2689139.6 ns   31769.37        128
+countParallelN      26          2722360.4 ns   40155.14        128
+countParallelN      27          2780600.7 ns   36491.48        128
+countParallelN      28          2962128.4 ns  136053.52        128
+countParallelN      29          2874845.9 ns   26431.24        128
+countParallelN      30          3013446.4 ns  144148.35        128
+countParallelN      31          2973117.0 ns   35465.21        128
+countParallelN      32          3005058.9 ns   39458.11        128
+While the lowest mean time when the LongCounter class was used was 3501918.8ns, this time when the AtomicLong class was used, that was - 2559437.7 ns,
+AtomicLong is developed by Java with Thead safety feature in mind and thus is it faster. 
+
+3.4
+1. > Normal Int > multiply                            4.3 ns       0.02   67108864
+2. > Volatile Int >				      0.004 s     0.2ns
+When using volatile the Read operation is faster. 
+Thought on Oracle doc, we read that "Reading and writing of volatile variables causes the variable to be read or written to main memory. Reading from and writing to main memory is more 
+expensive than accessing the CPU cache. Accessing volatile variables also prevent instruction reordering which is a normal performance enhancement technique. 
+Thus, you should only use volatile variables when you really need to enforce visibility of variables."
+ 
