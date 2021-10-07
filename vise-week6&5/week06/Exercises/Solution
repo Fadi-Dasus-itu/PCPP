@@ -1,0 +1,54 @@
+Exercise week06
+
+6.1.1 Use Mark7 to measure the execution time and verify that the time it takes to run the program
+    is proportional to the transation time.
+        Q: After run the experiment we verified that the program execution time is indeed proportional to transation time.
+
+        The proof is shown in the AccountExperOutput.txt file.
+
+6.1.2 Now consider the version  in ThreadsAccountExperimentsMany.java.
+    The first four lines of the transfer method are: . . .
+    Explain why the calculation of min and max  are necessary? 
+    Eg. What could happen if the code was written like this . . .
+    Run the program with both versions of the code shown above and explain the results of doing this.
+
+    Q See file ThreadsAccountExper.txt to see the results of running both version.
+
+6.1.2 Change the program at ThreadsAccountExperimentsMany to use the executor framework instead of raw threads. Make it use a fixed
+    size thread pool. For now do not worry of terminating the main thread, but insert a print method in the dotransation method, 
+    so you can see that all executors are alive.
+
+    Q Check ThreadsAccountExperimentsMany.java file
+
+6.1.4 Ensure that the executor shutsdowm after all tasks have been executed.
+    Q Check ThreadsAccountExperimentsMany.java file
+
+6.2.Use the code in the file TestCountPrimeThreads.java to count prime numbers using threads.
+
+6.2.1 Report and comment on the results you get from running TestCountPrimeThreads.java
+
+    Q The results can be found in CountParallel.txt file. 
+      We expected to have much better performance now that it's not using a singlethread approach. Because we assume that multithread approach improve the scalability and performace of an application, however in this situayion it's not beeing the case. 
+      
+     The criation and teardown of new threads are expensive, it takes time to create a new thread introducing latency. And we observe that one of the reason for the output we got may be because of the unrulled resources consuption, if there is not sufficient memory or cpu threads will be sit idle so generating more threads will not help in the pperformance.
+
+6.2.2 Rewrite the TestCountPrimesThreads.java to use executors instead of threads. Run your 
+    solutions and report results. How do they compare with version using thread?
+
+    Q: After run the program using the executor interface we got better results in terms of performance.
+        And that is because the executor interface finds solution for most of the problems we encountered in the previous example.
+        It reduces the cost of starting and teardown of new sthreads by reusing an existing thread instead of creationg a new. 
+        Another Advantange is that it garanties a better management of resources and that it's done by limiting the number of concurrent tasks. Therefor it ensure that the application will not fail due to resourse exhaustion.
+        Another interesting aspect is that the thread pools iliminates the latency associated with thread criation because of the use of worker threads.
+
+6.3 A histogram is a collection of bins, each of whice is an integer count. The span of the histagram is the number of bins
+    In the program below a span of 30 will be sufficient; in that case the bins a numbered 0...29.
+    Consider this histogram interface for creating histograms...
+
+6.3.1 Make a thread safe implementation, class Histogram2, of interface Histogram by adding suitable modifiers(final and syncronized)
+    to a copy of Histogram1 class. Which fields and methods need which modifiers.Why? Does the getSpan method need to be syncronized?
+    Q:
+
+
+
+

@@ -1,0 +1,10 @@
+Execution time for 1 transations      50195762.4 ns   88784.68          8
+Execution time for 2 transations     100466834.6 ns   79069.75          4
+Execution time for 3 transations     151169708.8 ns  784800.39          2
+Execution time for 4 transations     201330373.8 ns 1249171.91          2
+Execution time for 5 transations     251773382.4 ns 1167830.11          2
+Execution time for 6 transations     301386150.8 ns  877817.35          2
+Execution time for 7 transations     352081140.6 ns 1172808.92          2
+Execution time for 8 transations     401820659.1 ns  779588.10          2
+Execution time for 9 transations     452566646.9 ns 1589719.97          2
+Execution time for 10 transations     503069598.4 ns 1577378.30          2
