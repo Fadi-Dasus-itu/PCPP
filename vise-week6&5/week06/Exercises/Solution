@@ -12,7 +12,8 @@ Exercise week06
     Eg. What could happen if the code was written like this . . .
     Run the program with both versions of the code shown above and explain the results of doing this.
 
-    Q See file ThreadsAccountExper.txt to see the results of running both version.
+    Q See file ThreadsAccountExper.txt to see the results of running both version
+    ??? I couldn't explain the results, try to check and understand
 
 6.1.2 Change the program at ThreadsAccountExperimentsMany to use the executor framework instead of raw threads. Make it use a fixed
     size thread pool. For now do not worry of terminating the main thread, but insert a print method in the dotransation method, 
@@ -30,7 +31,9 @@ Exercise week06
     Q The results can be found in CountParallel.txt file. 
       We expected to have much better performance now that it's not using a singlethread approach. Because we assume that multithread approach improve the scalability and performace of an application, however in this situayion it's not beeing the case. 
       
-     The criation and teardown of new threads are expensive, it takes time to create a new thread introducing latency. And we observe that one of the reason for the output we got may be because of the unrulled resources consuption, if there is not sufficient memory or cpu threads will be sit idle so generating more threads will not help in the pperformance.
+     The criation and teardown of new threads are expensive, it takes time to create a new thread introducing latency. 
+     And we observe that one of the reason for the output we got may be because of the unrulled resources consuption,
+      if there is not sufficient memory or cpu threads will be sit idle so generating more threads will not help in the pperformance.
 
 6.2.2 Rewrite the TestCountPrimesThreads.java to use executors instead of threads. Run your 
     solutions and report results. How do they compare with version using thread?
@@ -47,7 +50,12 @@ Exercise week06
 
 6.3.1 Make a thread safe implementation, class Histogram2, of interface Histogram by adding suitable modifiers(final and syncronized)
     to a copy of Histogram1 class. Which fields and methods need which modifiers.Why? Does the getSpan method need to be syncronized?
-    Q:
+    Q:???
+
+6.3.1 Now consider counting the number of primes factors in a number p. 
+    As in Exercise 6.2 use the Histogram 2 class to write a program with
+     multiple threads that counts how many numbers in range ...
+     Q:???
 
 
 

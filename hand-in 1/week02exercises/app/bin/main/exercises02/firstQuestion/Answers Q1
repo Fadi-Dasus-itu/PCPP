@@ -1,0 +1,32 @@
+1- The first question is straight forward and already answered in the book/ the slides for the lecture. see class ReadWriteMonitor
+
+2.1Q: Is your solution fair towards writer threads? In other words, does your solution ensure that if a writer
+  thread wants to write, then it will eventually do so? If so, explain why.
+2.1A:  No:
+  As soon as a reader enter its critical section, then the writer should be really lucky to get the chance to write if the reader finishes reading
+  and there are no other readers incrementing the reader counter.
+  the writer thread will always be locked the condition queue until there are no more readers and the last one will notify
+  all the threads in the condition queue, in this case all of them are writers, because the reader will never enter the condition queue unless there is a writer.
+  However, if the writer starts before any reader it might get a chance to write until the first reader arrives then the writer chance will decrease to enter its
+  critical section as explained previously.
+  even if we used the fair flag in the lock it will not help
+  ,because the writer will never make it to the entry queue, in the condition queue the flag will not work
+
+
+
+2.2Q: If not, modify part 1. so that your implementation satisfies this fairness requirement, and then explain why your new solution satisfies
+  the requirement
+2.2A: the modified version of the reader/writer can be found at the FairReadWriteMonitor class
+The difference in this implementation is the writer set the writer flag to true if there are some readers executing, hence no more readers will enter
+which give the writer a chance to execute.
+
+3.Q
+3.A: our solution is nonfair
+However, we can set a flag on the constructor of the lock which gives us a week fairness because we used reentrantLock which has weak fairness.
+
+4.Q Is it possible to ensure strong fairness using ReentrantLock or intrinsic java locks (synchronized)?
+   Explain why.
+4.A No
+Strong fairness is not supported in Java due to the high performance cost. However, the best fairness we can get is either by setting the fair flag to true on the
+ReentrantLock (just we need to be aware that the fair flag has no affect in the condition queue)
+or implement our own fairness technique using synchronization, please look at SynchronizedFairness,
