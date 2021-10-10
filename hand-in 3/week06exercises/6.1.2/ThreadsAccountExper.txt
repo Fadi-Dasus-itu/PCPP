@@ -1,0 +1,117 @@
+Below we present the output of running both version, and after observing and analysing
+we conclude that there is no difference on using one version or other.
+
+
+public void transfer(){
+      Account s = accounts[source.id];
+      Account t = accounts[target.id];
+      synchronized(s){
+        synchronized(t){
+The output of not using max and min          
+
+Transfer 3925 from 9 to 0
+Transfer 5030 from 4 to 0
+Transfer 1435 from 2 to 4
+Transfer 3944 from 7 to 5
+Transfer 1128 from 6 to 1
+Transfer 3086 from 0 to 5
+Transfer 1357 from 7 to 0
+Transfer 1770 from 6 to 4
+Transfer 1696 from 0 to 7
+Transfer 1877 from 9 to 7
+Transfer 1391 from 1 to 8
+Transfer 4657 from 1 to 4
+Transfer 3203 from 9 to 5
+Transfer 2092 from 4 to 8
+Transfer 3778 from 7 to 1
+Transfer 2450 from 0 to 6
+Transfer 2979 from 9 to 6
+Transfer 422 from 1 to 3
+Transfer 4107 from 9 to 2
+Transfer 1570 from 1 to 4
+Transfer 3618 from 2 to 9
+Transfer 2147 from 6 to 9
+Transfer 4340 from 1 to 6
+Transfer 2950 from 9 to 4
+Transfer 2726 from 6 to 9
+Transfer 2293 from 8 to 9
+Transfer 4680 from 9 to 6
+Transfer 510 from 8 to 0
+Transfer 1090 from 3 to 0
+Transfer 3488 from 1 to 5
+Transfer 227 from 2 to 9
+Transfer 1334 from 1 to 8
+Transfer 444 from 9 to 1
+Transfer 776 from 6 to 9
+Transfer 891 from 9 to 0
+Transfer 4316 from 0 to 2
+Transfer 3642 from 6 to 1
+Transfer 782 from 1 to 5
+Transfer 1208 from 6 to 2
+Transfer 775 from 0 to 8
+Transfer 3793 from 2 to 8
+Transfer 1390 from 1 to 2
+Transfer 3774 from 6 to 7
+Transfer 3203 from 5 to 2
+Transfer 755 from 8 to 2
+Transfer 225 from 4 to 9
+Transfer 2260 from 2 to 9
+Transfer 466 from 5 to 3
+Transfer 1293 from 3 to 9
+Transfer 4770 from 9 to 3
+
+Account min = accounts[Math.min(source.id, target.id)];
+      Account max = accounts[Math.max(source.id, target.id)];
+      synchronized(min){
+        synchronized(max){
+
+The output of using max and min
+
+Transfer 3661 from 3 to 5
+Transfer 4610 from 3 to 9
+Transfer 2831 from 4 to 9
+Transfer 1295 from 5 to 9
+Transfer 4099 from 7 to 3
+Transfer 4285 from 0 to 6
+Transfer 4859 from 5 to 9
+Transfer 5058 from 1 to 9
+Transfer 350 from 7 to 5
+Transfer 2935 from 7 to 8
+Transfer 1558 from 8 to 5
+Transfer 2587 from 8 to 1
+Transfer 3887 from 1 to 4
+Transfer 4264 from 9 to 1
+Transfer 3685 from 5 to 3
+Transfer 701 from 4 to 0
+Transfer 3469 from 8 to 5
+Transfer 4520 from 5 to 2
+Transfer 4594 from 9 to 1
+Transfer 2598 from 8 to 1
+Transfer 1411 from 2 to 0
+Transfer 2910 from 9 to 1
+Transfer 1629 from 4 to 8
+Transfer 4561 from 3 to 6
+Transfer 2712 from 0 to 3
+Transfer 3141 from 8 to 3
+Transfer 1881 from 4 to 7
+Transfer 2767 from 6 to 9
+Transfer 2851 from 2 to 4
+Transfer 3406 from 2 to 3
+Transfer 159 from 2 to 0
+Transfer 3916 from 3 to 1
+Transfer 5055 from 5 to 3
+Transfer 3026 from 4 to 8
+Transfer 544 from 4 to 5
+Transfer 2013 from 6 to 1
+Transfer 1208 from 0 to 7
+Transfer 993 from 3 to 7
+Transfer 4033 from 2 to 0
+Transfer 2661 from 3 to 0
+Transfer 3266 from 1 to 8
+Transfer 4915 from 4 to 8
+Transfer 1101 from 0 to 4
+Transfer 4621 from 3 to 0
+Transfer 1309 from 7 to 0
+Transfer 4412 from 7 to 2
+Transfer 2464 from 3 to 7
+Transfer 1502 from 0 to 7
