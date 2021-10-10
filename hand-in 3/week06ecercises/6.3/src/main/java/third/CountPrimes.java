@@ -22,8 +22,7 @@ class CountPrimes {
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         final Histogram2 histogram = new Histogram2(30);
-        var numberOfProcessors = Runtime.getRuntime().availableProcessors();
-        ExecutorService pool = Executors.newFixedThreadPool(numberOfProcessors);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
         Future future = pool.submit(() -> {
             performCounting(0, 2_500_000, histogram);
         });
