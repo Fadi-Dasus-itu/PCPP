@@ -1,5 +1,24 @@
-Below we present the output of running both version, and after observing and analysing
-we conclude that there is no difference on using one version or other.
+Below we present the output of running both versions multiple times,
+we did not observe anything by running the program multiple times: 
+
+
+for example : Assume that S has id = 1 and T has id = 3
+without min and max
+
+1- Transfer S-> T
+2- S is locked 
+at the same time another thread executes:
+3- Transfer  T->S
+4- T is locked 
+now we have a deadlock because neither of the threads can aquire the lock on the second object
+4- DEADLOCK
+
+With min and max
+1. Transfer S -> T
+2. Sort and get min => S is locket first
+3. Another thread transfers T -> S
+4. Sort and get min => S is already locked so it has to wait
+=> There is no deadlock
 
 
 public void transfer(){
