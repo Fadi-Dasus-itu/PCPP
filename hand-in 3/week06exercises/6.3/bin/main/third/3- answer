@@ -1,0 +1,8 @@
+1-
+for the array: we added the final keyword that Guarantees visibility and Safe initialization fore the array object
+for the total variable: we added the volatile keyword to ensure visibility for the reading operation in the getTotal method,
+otherwise we must use the lock in the getTotal method to ensure reading the value from the main memory.
+
+the getSpan method does not need synchronization since the array is declared final which ensure visibility without synchronization and it is read only operation
+hence there are no race conditions to guard from. So, final ensure that the array.length is read from the main memory.
+
