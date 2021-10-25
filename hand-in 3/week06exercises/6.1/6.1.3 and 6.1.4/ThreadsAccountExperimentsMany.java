@@ -3,6 +3,7 @@ import java.util.Random;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 public class ThreadsAccountExperimentsMany {
 
   static final int N = 10; 
@@ -31,7 +32,7 @@ public class ThreadsAccountExperimentsMany {
       exec.execute(task);
     }exec.shutdown();
     try {
-      exec.awaitTermination(30, TimeUnit.SECONDS);
+      exec.awaitTermination(60, TimeUnit.SECONDS);
      } catch (InterruptedException e) {
       throw new RuntimeException(e);
      }
