@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class TestCountPrimesThreads {
   public static void main(String[] args) {
@@ -66,7 +67,7 @@ public class TestCountPrimesThreads {
     }
     exec.shutdown();
     try {
-      exec.awaitTermination(30, TimeUnit.SECONDS);
+      exec.awaitTermination(60, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
@@ -139,4 +140,12 @@ class LongCounter {
   public synchronized long get() {
     return count;
   }
+}
+
+class Timer {
+  private long start, spent = 0;
+  public Timer() { play(); }
+  public double check() { return (System.nanoTime()-start+spent)/1e9; }
+  public void pause() { spent += System.nanoTime()-start; }
+  public void play() { start = System.nanoTime(); }
 }
