@@ -65,6 +65,11 @@ public class TestCountPrimesThreads {
       exec.execute(task);
     }
     exec.shutdown();
+    try {
+      exec.awaitTermination(30, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
 
     return lc.get();
   }
