@@ -1,6 +1,6 @@
 // For week 7
 // raup@itu.dk * 10/10/2021
-package exercises07;
+package exercises07.second;
 
 class ReadWriteCASLock implements SimpleRWTryLockInterface {
 

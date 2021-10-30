@@ -1,9 +1,10 @@
 // For week 7
 // raup@itu.dk * 10/10/2021
-package exercises07;
+package exercises07.first;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntToDoubleFunction;
+
 
 class TestCASLockHistogram {
 
@@ -11,16 +12,18 @@ class TestCASLockHistogram {
     public static void main(String[] args) {
 
 	// Create an object `histogramCAS` with your Histogram CAS implementation
+    CasHistogram histogramCAS = new CasHistogram(30);
 	// Create an object `histogramLock` with your Histogram Lock from week 5
+    HistogramLock histogramLock = new HistogramLock(30);
 
 	// Testing correctness (uncomment lines below to test correctness)
-	// countParallel(5_000_000, 10, histogramCAS);
-	// dump(histogramCAS);
+	//countParallel(5_000_000, 10, histogramCAS);
+	//dump(histogramCAS);
 
 	// Evaluating performance of CAS vs Locks histograms Uncomment
 	// snippet below to evaluate the performance both Histogram
 	// implementations
-	/* 
+	 
 	int noThreads = 32;
 	int range     = 100_000;	
 
@@ -32,7 +35,7 @@ class TestCASLockHistogram {
 		      return 1.0;
 		  });
 	}
-	
+	/*
 	for (int i = 1; i < noThreads; i++) {
 	    int threadCount = i;
 	    Mark7(String.format("Count CAS histogram %2d", threadCount),
@@ -59,7 +62,7 @@ class TestCASLockHistogram {
     }
 
     // Parallel execution of counting the number of primes for numbers in `range`
-    private static void countParallel(int range, int threadCount, Histogram h) {
+    private static void countParallel(int range, int threadCount, Histogram2 h) {
 	final int perThread= range / threadCount;
 	Thread[] threads= new Thread[threadCount];
 	for (int t=0; t<threadCount; t= t+1) {
@@ -79,7 +82,7 @@ class TestCASLockHistogram {
     }
     
     // Auxiliary method to print the histogram data
-    public static void dump(Histogram histogram) {
+    public static void dump(Histogram2 histogram) {
 	for (int bin= 0; bin < histogram.getSpan(); bin= bin+1) {
 	    System.out.printf("%4d: %9d%n", bin, histogram.getCount(bin));
 	}
