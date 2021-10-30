@@ -4,8 +4,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.concurrent.ThreadSafe;
 
-import exercises07.Histogram;
-
 @ThreadSafe
 public class CasHistogram implements Histogram {
     private final AtomicInteger[] counts;
