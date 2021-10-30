@@ -1,0 +1,9 @@
+7.1: all methods are implemented:
+increment and getAndClear are thread safe since variable update happens through CAS non-blocking operation
+ by verifying that we have an updated version of the variable before updating it.
+getBins, getSpan: are thread safe since they are read only operation and the final key word guarantee that we have an updated version of the array
+from the main memory. Thus, we are always reading an updated version of the array.
+
+
+
+
