@@ -15,16 +15,16 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
         ReadWriteCASLock rwc = new ReadWriteCASLock();
 //        test the writer lock/unlock
-        rwc.writerTryLock();
-        rwc.writerUnlock();
+//        rwc.writerTryLock();
+//        rwc.writerUnlock();
         // test reader while a writer has the lock
-        rwc.writerTryLock();
+//        rwc.writerTryLock();
         rwc.readerTryLock();
-        rwc.writerUnlock();
+//        rwc.writerUnlock();
         // test reader lock/unlock
-        rwc.readerTryLock();
+//        rwc.readerTryLock();
         System.out.println("-------------------------");
-        rwc.writerTryLock();
+//        rwc.writerTryLock();
         rwc.readerUnlock();
 
     }
@@ -35,11 +35,11 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
         ReadWriteCASLock rwc = new ReadWriteCASLock();
         new Thread(() -> {
             try {
-//                rwc.writerTryLock();
-//                rwc.writerUnlock();
-//                rwc.readerTryLock();
-
+                rwc.writerTryLock();
+                rwc.writerUnlock();
                 rwc.readerTryLock();
+                rwc.readerTryLock();
+                rwc.readerUnlock();
                 rwc.readerUnlock();
                 System.out.println("---------------------");
             } catch (Exception e) {
@@ -47,14 +47,13 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
             }
 
         }).start();
-        Thread.sleep(1000);
         new Thread(() -> {
             try {
-//                rwc.writerTryLock();
-//                rwc.writerUnlock();
-
-//                rwc.readerTryLock();
-//
+                rwc.writerTryLock();
+                rwc.writerUnlock();
+                rwc.readerTryLock();
+                rwc.readerTryLock();
+                rwc.readerUnlock();
                 rwc.readerUnlock();
 
             } catch (Exception e) {
@@ -65,7 +64,7 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
     public static void main(String[] args) throws InterruptedException {
         //TODO execute tests (7.2.5 & 7.2.6)
-//        tesSingleThreaded();
+        tesSingleThreaded();
         testMultiThreaded();
     }
 
@@ -73,69 +72,52 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
 
     public boolean readerTryLock() {
-        System.out.println("///////");
-        System.out.println(Thread.currentThread().getName());
-        System.out.println("///////");
+
         if (this.holder.get() instanceof Writer) {
             System.out.println("reader could not acquire the lock since a writer already has it");
             return false;
         }
-        var updatedSuccessfully = false;
 
+        var updatedSuccessfully = false;
         var current = this.holder;
-        var newHolder = new ReaderList(Thread.currentThread());
+        var newHolder = new ReaderList(Thread.currentThread(), (ReaderList) current.get());
         updatedSuccessfully = holder.compareAndSet(null, newHolder);
         if (updatedSuccessfully) {
-
-            ReaderList.list.addLast(newHolder);
-            System.out.println("there is no one acquiring the lock and the reader successfully lock list size is: " + ReaderList.list.size());
+            System.out.println("there is no one acquiring the lock and the reader successfully locked ");
         }
+
         if (!updatedSuccessfully && current.get() instanceof ReaderList) {
             System.out.println("there is some reader(s) acquiring the lock, the reader tried to acquire the lock");
-
-            ReaderList.list.addLast(newHolder);
             do {
-                updatedSuccessfully = current.compareAndSet(current.get(), newHolder);
+                if (current.get() instanceof ReaderList) {
+                    var current2 = this.holder;
+                    var newHolder2 = new ReaderList(Thread.currentThread(), (ReaderList) current.get());
+                    updatedSuccessfully = current2.compareAndSet(current.get(), newHolder2);
+                }
             } while (!updatedSuccessfully);
             System.out.println("reader successfully acquired the lock and added to the list of readers");
-            System.out.println("number of readers are: " + ReaderList.list.size());
         }
         return updatedSuccessfully;
     }
 
 
     public void readerUnlock() {
-        System.out.println("///////");
-        System.out.println(Thread.currentThread().getName());
-        System.out.println("///////");
         var current = this.holder;
         var isReader = (current.get() instanceof ReaderList);
         if (!isReader) {
-            throw new InvalidUnlockException("the calling thread does not hold a write lock");
+            throw new InvalidUnlockException("the calling thread does not hold the lock");
         }
         var updatedSuccessfully = false;
         System.out.println("reader tries to unlock");
-        if (isReader) {
-           var removed = ReaderList.remove((ReaderList) current.get());
-           if(!removed){
-               throw new InvalidUnlockException("the calling thread does not hold a write lock");
-           }
-                System.out.println("reader has been removed");
-                System.out.println("the reader is removed from the list, list size now is :" + ReaderList.list.size());
+        if (this.holder.get() instanceof ReaderList) {
 
             do {
-                if (ReaderList.list.size() > 0) {
-                    updatedSuccessfully = current.compareAndSet(current.get(), ReaderList.list.getFirst());
-                }
-
-                if (ReaderList.list.size() == 0) {
-                    updatedSuccessfully = current.compareAndSet(current.get(), null);
-                }
-
+                var current2 = this.holder;
+                var newReader = ((ReaderList) this.holder.get()).remove((ReaderList) current2.get());
+                updatedSuccessfully = current2.compareAndSet(current2.get(), newReader);
             } while (!updatedSuccessfully);
             System.out.println("reader successfully unlocked");
         }
-
 
     }
 
@@ -165,34 +147,33 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
 
     private static class ReaderList extends Holders {
         private final Thread thread;
-        private final ReaderList next = null;
-        public static LinkedList<ReaderList> list = new LinkedList<>();
+        private final ReaderList next;
 
-        public ReaderList(Thread thread) {
+        public ReaderList(Thread thread, ReaderList reader) {
             this.thread = thread;
+            this.next = reader;
         }
 
-        public static boolean contains(ReaderList readerList) {
-            return list.stream().filter(x -> x.thread.equals(readerList.thread)).count() > 0;
+        public boolean contains(Thread thread) {
+            if (this.thread.equals(thread)) {
+                return true;
+            } else {
+                if (next == null)
+                    return false;
+                return this.next.contains(thread);
+            }
         }
 
-        public static boolean remove(ReaderList readerList) {
-            AtomicBoolean removed = new AtomicBoolean(false);
-            if (!contains(readerList))
+
+        public ReaderList remove(ReaderList readerList) {
+            if (!contains(readerList.thread))
                 throw new NotFoundException("no such a thread found in the list");
-            ReaderList.list = list
-                    .stream()
-                    .filter((x) -> {
-                        var match = !x.thread.getName().equals(Thread.currentThread().getName());
-                        if (!match) {
-                            removed.set(true);
-                        }
-                        return match;
-
-                    })
-                    .collect(Collectors.toCollection(LinkedList::new));
-            return removed.get();
+            var newReaderList = readerList.next;
+            if (Thread.currentThread().equals(readerList.thread))
+                return newReaderList;
+            throw new InvalidUnlockException("the current thread does not hold the lock");
         }
+
     }
 
     private static class Writer extends Holders {
