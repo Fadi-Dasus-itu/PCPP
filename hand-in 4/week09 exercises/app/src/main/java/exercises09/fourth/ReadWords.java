@@ -61,8 +61,3 @@ public class ReadWords {
         }
     }
 }
-
-//        return Flowable.using(
-//                () -> new BufferedReader(new FileReader("english-words.txt")),
-//                reader -> Flowable.fromIterable(() -> r = reader.lines().iterator()),
-//                reader -> reader.close()
