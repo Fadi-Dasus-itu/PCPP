@@ -15,27 +15,26 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class TestWordStream {
-    private static final String filename = "C:\\Users\\fadi.dasus\\OneDrive - Heartland AS\\Desktop\\Master first semester\\Practical Concurrent and Parallel Programming\\exercise code\\week05exercises\\app\\src\\main\\resources\\english-words.txt";
 
     public static void main(String[] args) {
 //        1:
-        System.out.println(readWords(filename).count());
+        System.out.println(readWords().count());
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        2: Write a stream pipeline to print the first 100 words from the file.
-        readWords(filename).limit(100).forEach(System.out::println);
+        readWords().limit(100).forEach(System.out::println);
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        3: Write a stream pipeline to find and print all words that have at least 22 letters.
-        readWords(filename).filter(x-> x.length()>=22).forEach(System.out::println);
+        readWords().filter(x-> x.length()>=22).forEach(System.out::println);
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        4: Write a stream pipeline to find and print some word that has at least 22 letters
-        readWords(filename).filter(x-> x.length()>=22).findAny().ifPresent(System.out::println);
+        readWords().filter(x-> x.length()>=22).findAny().ifPresent(System.out::println);
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        5: Write a method boolean isPalindrome - Write a stream pipeline to find all palindromes and print them
-        readWords(filename).filter(TestWordStream::isPalindrome).forEach(System.out::println);
+        readWords().filter(TestWordStream::isPalindrome).forEach(System.out::println);
 
 //        -----------------------------------------------------------------------------------------------------------------
 
@@ -45,14 +44,14 @@ public class TestWordStream {
 //        the sequential execution time is66 milliseconds
 
         long startSequential = System.nanoTime();
-        readWords(filename).filter(TestWordStream::isPalindrome).forEach(System.out::println);
+        readWords().filter(TestWordStream::isPalindrome).forEach(System.out::println);
         long durationSequential = (System.nanoTime() - startSequential) / 1000000;
         System.out.println("//////////////////////////////////////////////////////////////////////////sequential");
         System.out.println(" the sequential execution time is" + durationSequential + " milliseconds");
         System.out.println("//////////////////////////////////////////////////////////////////////////sequential");
 
         long startParallel = System.nanoTime();
-        readWords(filename).filter(TestWordStream::isPalindrome).parallel().unordered().forEach(System.out::println);
+        readWords().filter(TestWordStream::isPalindrome).parallel().unordered().forEach(System.out::println);
         long durationParallel = (System.nanoTime() - startParallel) / 1000000;
         System.out.println("//////////////////////////////////////////////////////////////////////////parallel");
         System.out.println("the parallel execution time is" + durationParallel + " milliseconds");
@@ -62,14 +61,14 @@ public class TestWordStream {
 //        -----------------------------------------------------------------------------------------------------------------
 //        7. Use a stream pipeline that turns the stream of words into a stream of their lengths, to find and print the minimal, maximal and average word lengths.
 
-        System.out.println(readWords(filename).mapToInt(String::length).min().getAsInt());
-        System.out.println(readWords(filename).mapToInt(String::length).max().getAsInt());
-        System.out.println(readWords(filename).mapToInt(String::length).average().getAsDouble());
+        System.out.println(readWords().mapToInt(String::length).min().getAsInt());
+        System.out.println(readWords().mapToInt(String::length).max().getAsInt());
+        System.out.println(readWords().mapToInt(String::length).average().getAsDouble());
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        8. Write a stream pipeline, using method collect and a groupingBy collector from class Collectors, to group the words by length
 
-        Map<Integer, List<String>> wordGrouping = readWords(filename).collect(Collectors.groupingBy(String::length));
+        Map<Integer, List<String>> wordGrouping = readWords().collect(Collectors.groupingBy(String::length));
         for (Map.Entry<Integer, List<String>> entry : wordGrouping.entrySet())
             System.out.println("Key = " + entry.getKey() +
                     ", Value = " + entry.getValue());
@@ -79,13 +78,13 @@ public class TestWordStream {
 //        Now write a stream pipeline that transforms all the English words into the corresponding tree map of letter
 //        counts, and print this for the first 100 words.
 
-        readWords(filename).limit(100).map(TestWordStream::letters).forEach(System.out::println);
+        readWords().limit(100).map(TestWordStream::letters).forEach(System.out::println);
 //        -----------------------------------------------------------------------------------------------------------------
 
 //        10. Use the tree map stream to write a stream pipeline to count the total number of times the letter e is used in
 //        the English words. For the words file on the course homepage the result should be 235,331.
 
-        var letterECounter = readWords(filename)
+        var letterECounter = readWords()
                 .map(TestWordStream::letters)
                 .map(Map::entrySet)
                 .flatMap(Collection::stream)
@@ -98,10 +97,10 @@ public class TestWordStream {
         System.out.println(letterECounter);
     }
 
-    public static Stream<String> readWords(String filename) {
+    public static Stream<String> readWords() {
 
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            BufferedReader reader = new BufferedReader(new FileReader("english-words.txt"));
             return reader.lines().parallel().unordered();
 
         } catch (IOException e) {

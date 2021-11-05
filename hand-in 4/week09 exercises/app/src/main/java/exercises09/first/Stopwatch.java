@@ -1,8 +1,6 @@
-package exercises09;
+package exercises09.first;
 
-import java.awt.event.*;  
-import javax.swing.*; 
-import java.util.Locale;
+import javax.swing.*;
 import java.util.concurrent.TimeUnit;
 /* This example is inspired by the StopWatch app in Head First. Android Development
    http://shop.oreilly.com/product/0636920029045.do
@@ -26,7 +24,7 @@ public class Stopwatch {
       public void run() {
 		    try {
           while ( true ) {
-            TimeUnit.SECONDS.sleep(1);
+            TimeUnit.SECONDS.sleep(1/10);
             myUI.updateTime();
         }
 		    } catch (java.lang.InterruptedException e) { System.out.println(e.toString());   }

@@ -1,4 +1,4 @@
-package exercises09;
+package exercises09.first;
 
 public class SecCounter {
   public int seconds;

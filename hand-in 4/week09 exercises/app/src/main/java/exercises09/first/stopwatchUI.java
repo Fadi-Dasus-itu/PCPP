@@ -1,4 +1,4 @@
-package exercises09;
+package exercises09.first;
 
 import java.awt.event.*;  
 import javax.swing.*; 
@@ -6,7 +6,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 // User interfaca for Stopwatch, October 7, 2021 by Jørgen Staunstrup, ITU, jst@itu.dk
 
-class stopwatchUI {
+public class stopwatchUI {
   final private String allzero = "0:00:00";
   private int lx;
   private static JFrame lf;

@@ -8,6 +8,6 @@ import static org.junit.Assert.*;
 
 public class AppTest {
     @Test public void appHasAGreeting() {
-        assertNotNull("app should have a greeting", null);
+        assertNotNull("app should have a greeting", "app should have a greeting");
     }
 }

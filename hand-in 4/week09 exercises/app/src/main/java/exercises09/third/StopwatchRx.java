@@ -1,8 +1,8 @@
-package exercises09;
-import java.awt.event.*;  
-import javax.swing.*; 
+package exercises09.third;
+import javax.swing.*;
 import java.util.concurrent.TimeUnit;
 
+import exercises09.first.stopwatchUI;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -24,6 +24,7 @@ public static void main(String[] args) {  new StopwatchRx(); }
  
     //TO DO
     //Insert code using timer and display to make a working version of the Stopwatch
+    timer.subscribe(display);
     
     f.setLayout(null);  
 		f.setVisible(true);   

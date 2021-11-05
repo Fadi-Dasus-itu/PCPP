@@ -1,0 +1,8 @@
+on line 11 we are creating an observable of type that produces the array ("A", "AB", "ABC") on at a time
+we specify the subscriber to be three threads from a fixed thread pool (3)
+any thread can receive an event from the observable, and finally we will faltmap the result from them all
+since we have a delay explicitly in the subscriber "getLengthWithDelay" method all the thread will
+get chance to receive one of the events
+the first thread get "A" and print Item length 1
+the second thread get "AB" and print Item length 2
+the third thread get "ABC" and print Item length 3
