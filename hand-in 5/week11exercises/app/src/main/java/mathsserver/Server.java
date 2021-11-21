@@ -1,11 +1,12 @@
 package mathsserver;
 
-// Hint: The imports below may give you hints for solving the exercise.
-//       But feel free to change them.
-
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
+import akka.actor.typed.ChildFailed;
+import akka.actor.typed.Terminated;
 import akka.actor.typed.javadsl.*;
+
+import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -63,62 +64,72 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
         return newReceiveBuilder()
                 .onMessage(ComputeTasks.class, this::onComputeTasks)
                 .onMessage(WorkDone.class, this::onWorkDone)
-                // To be extended
+                .onSignal(ChildFailed.class, this::onChildFailed)
+                .onSignal(Terminated.class, this::onTerminated)
                 .build();
     }
 
 
     /* --- Handlers ------------------------------------- */
 
+
     public Behavior<ServerCommand> onComputeTasks(ComputeTasks msg) {
-
-        LOG("number of tasks :" + msg.tasks.size());
-//TODO improve this
-
-        var taskLeft = true;
-        while (msg.tasks.size() > 0 && taskLeft) {
+        while (msg.tasks.size() > 0) {
             var idleWorkers = getIdleWorkersIfAny();
 
             if (idleWorkers.size() > 0 && msg.tasks.size() > 0) {
-                var idleWorker = idleWorkers.remove(0);
-                idleWorker.tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
-                LOG(" the worker is currently doing the task, worker name : " + idleWorker.path().name());
-                workers.put(idleWorker, "BUSY");
-                LOG("number of tasks left : " + msg.tasks.size());
-                LOG("------------");
+                assignTaskToIdleWorker(msg, idleWorkers);
                 continue;
             }
-
             if ((idleWorkers.size() == 0) && (workers.size() < this.maxWorkers)) {
-                LOG("no idle workers are available .... ");
-                var newWorker = spawnNewWorkerIfAllowed();
-                if (newWorker.isPresent())
-                    newWorker.get().tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
+                assignTaskToNewWorker(msg);
                 continue;
             }
-
-            taskLeft = false;
             msg.tasks.forEach(x -> pendingTasks.add(new ClientTaskDTO(msg.client, x)));
             break;
         }
         return this;
     }
 
-
     public Behavior<ServerCommand> onWorkDone(WorkDone msg) {
-        //TODO improve this
         LOG("worker : " + msg.worker.path().name() + " is done computing");
-        if (pendingTasks.size() > 0) {
-            LOG("Assigning new task for the worker: " + msg.worker.path().name());
-            var task = pendingTasks.poll();
-            if (task != null)
-                msg.worker.tell(new Worker.ComputeTask(task.task(), task.client()));
-            LOG("number of pending tasks : " + pendingTasks.size());
-        }
         if (pendingTasks.size() == 0) {
             LOG("changing the state of the worker : " + msg.worker.path().name() + " to IDLE");
             workers.put(msg.worker, "IDLE");
+        } else {
+            LOG("Assigning new task for the worker: " + msg.worker.path().name());
+            var task = pendingTasks.poll();
+            if (task != null) {
+                getContext().watch(msg.worker);
+                msg.worker.tell(new Worker.ComputeTask(task.task(), task.client()));
+                LOG("number of pending tasks : " + pendingTasks.size());
+            }
         }
+        return this;
+    }
+
+
+    public Behavior<ServerCommand> onTerminated(Terminated msg) {
+
+        if (workers.remove(msg.getRef()) != null) {
+            getContext().getLog().info("{}: {} terminated normally.",
+                    getContext().getSelf().path().name(),
+                    msg.getRef().path().name());
+        }
+
+        return this;
+    }
+
+
+    public Behavior<ServerCommand> onChildFailed(ChildFailed msg) {
+
+        ActorRef<Void> crashedChild = msg.getRef();
+        workers.remove(crashedChild);
+        if (workers.size() < this.minWorkers && workers.size() > this.maxWorkers) {
+            spawnNewWorkerIfAllowed();
+        } else getContext().getLog().info("{}: No job from worker {} found.",
+                getContext().getSelf().path().name(),
+                msg.getRef().path().name());
         return this;
     }
 
@@ -129,33 +140,51 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
                 .entrySet()
                 .stream()
                 .filter(x -> x.getValue().equals("IDLE"))
-                .map(x -> x.getKey()).collect(Collectors.toList());
+                .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     private void spawnMinWorkers(int minWorkers) {
         IntStream.range(0, minWorkers)
-                .forEach((workerId) -> {
-                    workers.put(getContext().spawn(Worker.create(getContext().getSelf()),
-                            "worker_" + workerId), "IDLE");
-                });
+                .forEach((workerId) -> workers.put(getContext().spawn(Worker.create(getContext().getSelf()),
+                        RandomStringUtils.randomNumeric(10)), "IDLE"));
         LOG("spawn initial workers, number of workers: " + workers.size());
         LOG("------------");
 
     }
 
     private Optional<ActorRef<Worker.WorkerCommand>> spawnNewWorkerIfAllowed() {
-        LOG("checking if allowed to spawn new worker");
         LOG("spawning a new worker");
         final ActorRef<Worker.WorkerCommand> worker =
                 getContext().spawn(Worker.create(getContext().getSelf()),
-                        "worker_" + (workers.size() + 1));
+                        RandomStringUtils.randomNumeric(10));
         workers.put(worker, "IDLE");
         LOG("Number of workers: " + workers.size());
         LOG("------------");
         return Optional.of(worker);
     }
 
+    private void assignTaskToIdleWorker(ComputeTasks msg, List<ActorRef<Worker.WorkerCommand>> idleWorkers) {
+        var idleWorker = idleWorkers.remove(0);
+        getContext().watch(idleWorker);
+        idleWorker.tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
+        LOG(" changing worker " + idleWorker.path().name() + " state to BUSY");
+        workers.put(idleWorker, "BUSY");
+        LOG("number of tasks left : " + msg.tasks.size());
+        LOG("------------");
+    }
+
+    private void assignTaskToNewWorker(ComputeTasks msg) {
+        LOG("no idle workers are available .... ");
+        var newWorker = spawnNewWorkerIfAllowed();
+        if (newWorker.isPresent()) {
+            getContext().watch(newWorker.get());
+            newWorker.get().tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
+        }
+    }
+
     private void LOG(String msg) {
         System.out.println(msg);
     }
+
+
 }
