@@ -9,6 +9,7 @@ import akka.actor.typed.javadsl.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.List;
 import java.util.LinkedList;
@@ -16,23 +17,20 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Server extends AbstractBehavior<Server.ServerCommand> {
+
     /* --- Messages ------------------------------------- */
+
     public interface ServerCommand {
     }
 
-    public record ComputeTasks(List<Task> tasks,
-                               ActorRef<Client.ClientCommand> client) implements ServerCommand {
+    public record ComputeTasks(List<Task> tasks, ActorRef<Client.ClientCommand> client) implements ServerCommand {
     }
 
-    public static final class WorkDone implements ServerCommand {
-        ActorRef<Worker.WorkerCommand> worker;
-
-        public WorkDone(ActorRef<Worker.WorkerCommand> worker) {
-            this.worker = worker;
-        }
+    public record WorkDone(ActorRef<Worker.WorkerCommand> worker) implements ServerCommand {
     }
 
     /* --- State ---------------------------------------- */
+
     Queue<ClientTaskDTO> pendingTasks = new LinkedList<>();
     Map<ActorRef<Worker.WorkerCommand>, String> workers = new HashMap<>();
     int minWorkers;
@@ -40,32 +38,26 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
 
 
     /* --- Constructor ---------------------------------- */
-    private Server(ActorContext<ServerCommand> context,
-                   int minWorkers, int maxWorkers) {
+
+    private Server(ActorContext<ServerCommand> context, int minWorkers, int maxWorkers) {
         super(context);
-        // To be implemented
         this.minWorkers = minWorkers;
-        this.minWorkers = maxWorkers;
-        IntStream
-                .range(0, minWorkers)
-                .forEach((workerId) -> {
-                    final ActorRef<Worker.WorkerCommand> worker =
-                            getContext().spawn(Worker.create(getContext().getSelf()),
-                                    "worker_" + workerId);
-                    workers.put(worker, "IDLE");
-                });
+        this.maxWorkers = maxWorkers;
+        spawnMinWorkers(minWorkers);
         getContext().getLog().info("{}: Server and workers started",
                 getContext().getSelf().path().name());
     }
 
 
     /* --- Actor initial state -------------------------- */
+
     public static Behavior<ServerCommand> create(int minWorkers, int maxWorkers) {
         return Behaviors.setup(context -> new Server(context, minWorkers, maxWorkers));
     }
 
 
     /* --- Message handling ----------------------------- */
+
     @Override
     public Receive<ServerCommand> createReceive() {
         return newReceiveBuilder()
@@ -77,37 +69,82 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
 
 
     /* --- Handlers ------------------------------------- */
+
     public Behavior<ServerCommand> onComputeTasks(ComputeTasks msg) {
-        var localTasks = msg.tasks;
-        var taskSize = msg.tasks.size();
-        var workersReference = workers
-                .entrySet()
-                .stream()
-                .filter(x -> x.getValue().equals("IDLE"))
-                .map(x -> x.getKey()).collect(Collectors.toList());
+
+        LOG("number of tasks :" + msg.tasks.size());
 //TODO improve this
-        while (localTasks.size() > 0) {
-            if (workersReference.size() > 0 && localTasks.size() > 0) {
-                workersReference.get(0).tell(new Worker.ComputeTask(localTasks.remove(0), msg.client));
+
+
+        while (msg.tasks.size() > 0) {
+            var idleWorkers = getIdleWorkersIfAny();
+            if (idleWorkers.size() > 0 && msg.tasks.size() > 0) {
+                var idleWorker = idleWorkers.remove(0);
+                idleWorker.tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
+                LOG(" the worker is currently doing the task, worker name : " + idleWorker.path().name());
+                workers.put(idleWorker, "BUSY");
+                LOG("number of tasks left : " + msg.tasks.size());
+                LOG("------------");
+                continue;
             }
-            if (workersReference.size() == 0 && workers.size() < this.maxWorkers) {
-                final ActorRef<Worker.WorkerCommand> worker =
-                        getContext().spawn(Worker.create(getContext().getSelf()),
-                                "worker_" + workers.size() + 1);
-                workers.put(worker, "IDLE");
-                worker.tell(new Worker.ComputeTask(localTasks.remove(0), msg.client));
+            if (idleWorkers.size() == 0) {
+                LOG("no idle workers are available .... ");
+                var newWorker = spawnNewWorkerIfAllowed();
+                if (newWorker.isPresent())
+                    newWorker.get().tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
+                continue;
             }
-            if (!(workersReference.size() > 0 && localTasks.size() > 0) && !(workersReference.size() == 0 && workers.size() < this.maxWorkers)) {
-                localTasks.forEach(x ->
-                        pendingTasks.add(new ClientTaskDTO(msg.client, x))
-                );
-            }
+
+            msg.tasks.forEach(x -> pendingTasks.add(new ClientTaskDTO(msg.client, x)));
+
         }
         return this;
     }
 
+
     public Behavior<ServerCommand> onWorkDone(WorkDone msg) {
         // To be implemented
         return this;
+    }
+
+    /*------------------- helper methods-------------------- */
+
+    private List<ActorRef<Worker.WorkerCommand>> getIdleWorkersIfAny() {
+        return workers
+                .entrySet()
+                .stream()
+                .filter(x -> x.getValue().equals("IDLE"))
+                .map(x -> x.getKey()).collect(Collectors.toList());
+    }
+
+    private void spawnMinWorkers(int minWorkers) {
+        IntStream.range(0, minWorkers)
+                .forEach((workerId) -> {
+                    workers.put(getContext().spawn(Worker.create(getContext().getSelf()),
+                            "worker_" + workerId), "IDLE");
+                });
+        LOG("spawn initial workers, number of workers: " + workers.size());
+        LOG("------------");
+
+    }
+
+    private Optional<ActorRef<Worker.WorkerCommand>> spawnNewWorkerIfAllowed() {
+        LOG("checking if allowed to spawn new worker");
+        if (workers.size() < this.maxWorkers) {
+            LOG("spawning a new worker");
+            final ActorRef<Worker.WorkerCommand> worker =
+                    getContext().spawn(Worker.create(getContext().getSelf()),
+                            "worker_" + (workers.size() + 1));
+            workers.put(worker, "IDLE");
+            LOG("Number of workers: " + workers.size());
+            LOG("------------");
+            return Optional.of(worker);
+        }
+
+        return Optional.empty();
+    }
+
+    private void LOG(String msg) {
+        System.out.println(msg);
     }
 }
