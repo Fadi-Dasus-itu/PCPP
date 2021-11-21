@@ -3,6 +3,8 @@
  */
 package exercises07;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -14,4 +16,6 @@ public class AppTest {
     @Test public void test1() {
         assert(2==1+1);
     }
+
 }
+
