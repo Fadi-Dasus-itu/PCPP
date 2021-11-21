@@ -75,9 +75,10 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
         LOG("number of tasks :" + msg.tasks.size());
 //TODO improve this
 
-
-        while (msg.tasks.size() > 0) {
+        var taskLeft = true;
+        while (msg.tasks.size() > 0 && taskLeft) {
             var idleWorkers = getIdleWorkersIfAny();
+
             if (idleWorkers.size() > 0 && msg.tasks.size() > 0) {
                 var idleWorker = idleWorkers.remove(0);
                 idleWorker.tell(new Worker.ComputeTask(msg.tasks.remove(0), msg.client));
@@ -87,7 +88,8 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
                 LOG("------------");
                 continue;
             }
-            if (idleWorkers.size() == 0) {
+
+            if ((idleWorkers.size() == 0) && (workers.size() < this.maxWorkers)) {
                 LOG("no idle workers are available .... ");
                 var newWorker = spawnNewWorkerIfAllowed();
                 if (newWorker.isPresent())
@@ -95,15 +97,28 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
                 continue;
             }
 
+            taskLeft = false;
             msg.tasks.forEach(x -> pendingTasks.add(new ClientTaskDTO(msg.client, x)));
-
+            break;
         }
         return this;
     }
 
 
     public Behavior<ServerCommand> onWorkDone(WorkDone msg) {
-        // To be implemented
+        //TODO improve this
+        LOG("worker : " + msg.worker.path().name() + " is done computing");
+        if (pendingTasks.size() > 0) {
+            LOG("Assigning new task for the worker: " + msg.worker.path().name());
+            var task = pendingTasks.poll();
+            if (task != null)
+                msg.worker.tell(new Worker.ComputeTask(task.task(), task.client()));
+            LOG("number of pending tasks : " + pendingTasks.size());
+        }
+        if (pendingTasks.size() == 0) {
+            LOG("changing the state of the worker : " + msg.worker.path().name() + " to IDLE");
+            workers.put(msg.worker, "IDLE");
+        }
         return this;
     }
 
@@ -130,18 +145,14 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
 
     private Optional<ActorRef<Worker.WorkerCommand>> spawnNewWorkerIfAllowed() {
         LOG("checking if allowed to spawn new worker");
-        if (workers.size() < this.maxWorkers) {
-            LOG("spawning a new worker");
-            final ActorRef<Worker.WorkerCommand> worker =
-                    getContext().spawn(Worker.create(getContext().getSelf()),
-                            "worker_" + (workers.size() + 1));
-            workers.put(worker, "IDLE");
-            LOG("Number of workers: " + workers.size());
-            LOG("------------");
-            return Optional.of(worker);
-        }
-
-        return Optional.empty();
+        LOG("spawning a new worker");
+        final ActorRef<Worker.WorkerCommand> worker =
+                getContext().spawn(Worker.create(getContext().getSelf()),
+                        "worker_" + (workers.size() + 1));
+        workers.put(worker, "IDLE");
+        LOG("Number of workers: " + workers.size());
+        LOG("------------");
+        return Optional.of(worker);
     }
 
     private void LOG(String msg) {
