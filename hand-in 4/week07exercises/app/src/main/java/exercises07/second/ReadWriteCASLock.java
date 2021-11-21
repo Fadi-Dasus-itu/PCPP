@@ -14,21 +14,20 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
     private static void tesSingleThreaded() {
 
         ReadWriteCASLock rwc = new ReadWriteCASLock();
-//        test the writer lock/unlock
-//        rwc.writerTryLock();
-//        rwc.writerUnlock();
+        // test the writer lock/unlock
+        // rwc.writerTryLock();
+        // rwc.writerUnlock();
         // test reader while a writer has the lock
-//        rwc.writerTryLock();
+        // rwc.writerTryLock();
         rwc.readerTryLock();
-//        rwc.writerUnlock();
+        // rwc.writerUnlock();
         // test reader lock/unlock
-//        rwc.readerTryLock();
+        // rwc.readerTryLock();
         System.out.println("-------------------------");
-//        rwc.writerTryLock();
+        // rwc.writerTryLock();
         rwc.readerUnlock();
 
     }
-
 
     private static void testMultiThreaded() throws InterruptedException {
 
@@ -63,13 +62,12 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        //TODO execute tests (7.2.5 & 7.2.6)
+        // TODO execute tests (7.2.5 & 7.2.6)
         tesSingleThreaded();
         testMultiThreaded();
     }
 
     public static AtomicReference<Holders> holder = new AtomicReference<>();
-
 
     public boolean readerTryLock() {
 
@@ -99,7 +97,6 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
         }
         return updatedSuccessfully;
     }
-
 
     public void readerUnlock() {
         var current = this.holder;
@@ -134,12 +131,18 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
         return success;
     }
 
+    // Correction for 7.2.2 as requested
     public void writerUnlock() {
-
-        var current = this.holder;
-        if (!current.compareAndSet(current.get(), null))
-            throw new InvalidUnlockException("the calling thread does not hold a write lock");
-        System.out.println("writer unlocked successfully");
+        final Thread current = Thread.currentThread();
+        Holders oldValue;
+        while ((oldValue = holder.get()) != null && oldValue instanceof Writer
+                && ((Writer) oldValue).thread.equals(current)) {
+            if (holder.compareAndSet(oldValue, null))
+                System.out.println("writer unlocked successfully");
+            return;
+        }
+        throw new RuntimeException(
+                String.format("Invalid writerUnlock: thread %d does not hold a lock", current.getId()));
     }
 
     private static abstract class Holders {
@@ -163,7 +166,6 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
                 return this.next.contains(thread);
             }
         }
-
 
         public ReaderList remove(ReaderList readerList) {
             if (!contains(readerList.thread))

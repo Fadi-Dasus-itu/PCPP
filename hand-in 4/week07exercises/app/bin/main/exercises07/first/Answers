@@ -1,8 +1,8 @@
 7.1: all methods are implemented:
 increment and getAndClear are thread safe since variable update happens through CAS non-blocking operation
  by verifying that we have an updated version of the variable before updating it.
-getBins, getSpan: are thread safe since they are read only operation and the final key word guarantee that we have an updated version of the array
-from the main memory. Thus, we are always reading an updated version of the array.
+getBins, getSpan: are thread safe since they are read only operation and the final key word as well as using the AtomicInteger guarantee visibility between threads.
+ Thus, we are always reading an updated version of the array.
 
 7.2 Output of performance Histogram evaluation for CAS and Locks from week6.
 
