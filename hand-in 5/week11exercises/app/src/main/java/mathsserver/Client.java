@@ -65,7 +65,7 @@ public class Client extends AbstractBehavior<Client.ClientCommand> {
     public Behavior<ClientCommand> onClientStart(ClientStart msg) {
 
         Random r = new Random();
-        tasks.add(new Task(r.nextInt(), 1, BinaryOperation.DIV));
+        tasks.add(new Task(r.nextInt(), 0, BinaryOperation.DIV));
         tasks.add(new Task(r.nextInt(), 0, BinaryOperation.SUM));
         tasks.add(new Task(r.nextInt(), 0, BinaryOperation.SUB));
         tasks.add(new Task(r.nextInt(), 0, BinaryOperation.MUL));

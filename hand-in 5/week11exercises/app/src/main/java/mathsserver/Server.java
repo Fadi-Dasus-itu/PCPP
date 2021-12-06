@@ -77,7 +77,7 @@ public class Server extends AbstractBehavior<Server.ServerCommand> {
         while (msg.tasks.size() > 0) {
             var idleWorkers = getIdleWorkersIfAny();
 
-            if (idleWorkers.size() > 0 && msg.tasks.size() > 0) {
+            if (idleWorkers.size() > 0 ) {
                 assignTaskToIdleWorker(msg, idleWorkers);
                 continue;
             }

@@ -84,7 +84,9 @@ class ReadWriteCASLock implements SimpleRWTryLockInterface {
                 && ((ReaderList) oldValue).contains(current))
             if (holder.compareAndSet(oldValue, ((ReaderList) oldValue).remove(current)))
                 return;
-            throw new InvalidUnlockException("the calling thread does not hold the lock");
+
+
+        throw new InvalidUnlockException("the calling thread does not hold the lock");
      }
 
     public boolean writerTryLock() {
